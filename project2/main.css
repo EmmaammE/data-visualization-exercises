@@ -1,0 +1,14 @@
+body {
+    background: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#chart {
+    /* background: #fff; */
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      cursor: pointer;
+}
