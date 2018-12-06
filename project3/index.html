@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            flex-direction:column;
+        }
+
+        .box {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+        #chart {
+            display: flex;
+        }
+
+        #legend {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 800px;
+            margin-left: 15px;
+        }
+
+        .legend {
+            width: 146px;
+            max-width: 146px;
+            overflow-x: auto;
+            max-height: 500px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+        }
+        .legend span {
+            display: flex;
+            align-items: center;
+            margin: 1px;
+            margin-right: 3px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        p {
+            display: inline-block;
+            /* margin: 0 5px 0 0; */
+            line-height: 15px;
+            font-size: 12px;
+        }
+
+        .hide {
+            opacity: 0;
+            stroke-width: 0
+        }
+
+        .btn {
+            width: 145px;
+            background: none;
+            outline: none;
+            border: solid 1px #000;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="box">
+   <div class="box">
+        <div id="chart">
+        </div>
+        <div id="legend">
+            <button id="all" class="btn" title="展示前十个人物">初始化</button>
+        </div>
+   </div>
+   <!-- <div></div> -->
+    <script src="../d3.js"></script>
+<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+    <script src="temp.js"></script>
+</body>
+</html>
