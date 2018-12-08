@@ -7,14 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
-            flex-direction:column;
+            flex-direction:row!important;
         }
 
         .box {
             display: flex;
-            flex-direction: row;
             justify-content: center;
             align-items: center;
+            flex-direction:column;
         }
         #chart {
             display: flex;
@@ -25,15 +25,16 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 800px;
+            height: 1000px;
             margin-left: 15px;
         }
 
         .legend {
-            width: 146px;
-            max-width: 146px;
+            width: 200px;
+            max-width: 200px;
             overflow-x: auto;
             max-height: 500px;
+            min-height: 700px;
             display: flex;
             flex-direction: column;
             flex-wrap: wrap;
@@ -45,6 +46,7 @@
             margin-right: 3px;
             height: 20px;
             cursor: pointer;
+            width: 100px;
         }
         .icon {
             display: inline-block;
@@ -55,13 +57,15 @@
         p {
             display: inline-block;
             /* margin: 0 5px 0 0; */
-            line-height: 15px;
             font-size: 12px;
         }
 
+        p.number {
+            width: 25px;
+        }
+
         .hide {
-            opacity: 0;
-            stroke-width: 0
+            display: none;
         }
 
         .btn {
@@ -72,19 +76,24 @@
             margin-bottom: 5px;
             cursor: pointer;
         }
+
+        #chapter {
+            font-size: 14px;
+        }
     </style>
 </head>
 <body class="box">
    <div class="box">
-        <div id="chart">
-        </div>
-        <div id="legend">
-            <button id="all" class="btn" title="展示前十个人物">初始化</button>
-        </div>
+        <div id="chart"></div>
+    <div id="timeline"></div>
    </div>
+
+    <div id="legend">
+        <button id="all" class="btn" title="展示前十个人物">初始化</button>
+        <p id="chapter" class="hide"></p>
+    </div>
    <!-- <div></div> -->
     <script src="../d3.js"></script>
-<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
-    <script src="temp.js"></script>
+    <script src="beta2.js"></script>
 </body>
 </html>
