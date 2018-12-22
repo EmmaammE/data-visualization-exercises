@@ -218,7 +218,7 @@ const debug = false;
 			});
 	}
 
-	loadData(data, filter.year)
+	loadData(data, 2015)
 		.then(parsed_data => {
 			initScale(parsed_data);
 			initAxis($chart);
