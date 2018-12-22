@@ -2,27 +2,22 @@
     var template = {
         padding: 20,
         padding_v: 20, //vertical
-        width: 920, //960 - 20*2
-        height: 460, //500 - 20*2
+        width: 460, //960 - 20*2
+        height: 300, //500 - 20*2
+        width_: 500, //960 - 20*2 barchat
+        height_: 300, //500 - 20*2
         file: 'top1000.csv', //  name num
-        graph: '#cloud'
+        graph: '#cloud',
+        barchart:'#barchart'
     }
 
-    function getScaleValues(data) {
-        var debug = false;
-        var domain = d3.extent(data,d=>d.num);
-        var range = [20, 70]
-        debug && console.log(range);
-        return {
-            domain: domain,
-            range: range
-        }
+    function setColor() {
+        return d3.scaleOrdinal(d3.schemeCategory20);
     }
-
     function createWordCloud(data) {
         console.log(data);
         console.log(data);
-        var color = d3.scaleOrdinal(d3.schemeCategory20);
+        var color = setColor();
         const {
             domain,
             range
@@ -63,16 +58,28 @@
                 .text(d => d.text)
         }
 
+        function initGraph(graph) {
+            var svg = d3.select(graph).append("svg")
+                .attr("width", template.width)
+                .attr("height", template.height)
+                .attr("transform", "translate(" + template.padding + "," + template.padding_v + ")");
+            var g = svg.append("g").attr("transform", "translate(" + template.width / 2 + "," + template.height / 2 + ")");
+            return g;
+        }
+
+        function getScaleValues(data) {
+            var debug = false;
+            var domain = d3.extent(data, d => d.num);
+            var range = [20, 70]
+            debug && console.log(range);
+            return {
+                domain: domain,
+                range: range
+            }
+        }
+
     }
 
-    function initGraph(graph) {
-        var svg = d3.select(graph).append("svg")
-            .attr("width", template.width)
-            .attr("height", template.height)
-            .attr("transform", "translate(" + template.padding + "," + template.padding_v + ")");
-        var g = svg.append("g").attr("transform", "translate(" + template.width / 2 + "," + template.height / 2 + ")");
-        return g;
-    }
     // @test
     function loadData(file) {
         return new Promise((resolve, reject) => {
@@ -90,6 +97,93 @@
         });
     }
 
+    function createBarchart(data){
+        var $barchart = d3.select(template.barchart)
+            .append('svg')
+            .attr('class','barchart')
+            .attr("width", template.width_+template.padding)
+            .attr("height", template.height_+template.padding_v)
+
+        var xScale,yScale,xAxis,yAxis;
+        var color = setColor();
+        var data_extent = d3.extent(data, d => d.num);
+        render();
+
+        function render() {
+            initScale(data);
+            $barchart.append('g')
+                .selectAll('rect')
+                .data(data)
+                .enter()
+                .append('rect')
+                .attr('x',(d,i)=>{
+                    console.log(xScale(i));
+                    return xScale(i) + template.padding+ 6;
+                })
+                .attr('fill',(d,i)=>color(i))
+                .attr('width', (template.width_ - 150) / (data.length + 1))
+                .attr('y', yScale(data_extent[0]))
+                .attr('height', 0)
+                // define hover
+                .on('mouseover', function (d) {
+                    // showLabels(d);
+                })
+                .on('mouseout', function (d) {
+                    // hideLabels(d);
+                })
+                .transition()
+                // .delay(function (d, i) {
+                //     return i * 150;
+                // })
+                .ease(d3.easeSinIn)
+                .attr('height', d => (template.height_  - yScale(d.num)))
+                .attr('y', d => (yScale(d.num) ));
+
+                $barchart
+                    .append('g')
+                    .attr('class', 'x axis')
+                    .attr('transform', 'translate(' + template.padding + ',' + (template.height_) + ')')
+                    .call(xAxis);
+
+                $barchart
+                    .append('g')
+                    .attr('class', 'y axis')
+                    .attr('transform', 'translate(' + 2*template.padding + ',0)')
+                    .call(yAxis);
+        }
+
+        function initScale(data) {
+            xScale = d3.scaleLinear()
+                .domain([0,data.length])
+                .range([
+                    template.padding,
+                    template.width
+                ]);
+
+            yScale = d3.scaleLinear()
+                // .domain([0,d3.max(data,d=>d.num)])
+                .domain(data_extent)
+                .range([template.height,template.padding_v])
+                .nice();
+
+            xAxis = d3
+                .axisBottom()
+                .scale(xScale)
+                .tickFormat((d,i)=>{
+                    if(i===0) {
+                        return null;
+                    }
+                    return data[i-1].name;
+                })
+                .ticks(data.length);
+
+            yAxis = d3
+                .axisLeft()
+                .scale(yScale)
+                .ticks(10);
+        }
+    }
+
     loadData(template.file)
         .then(parsed_data => {
             var debug = true;
@@ -101,6 +195,7 @@
 
             }
             createWordCloud(words);
+            createBarchart(words)
         })
         .catch(error => {
             console.log(error);
