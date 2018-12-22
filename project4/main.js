@@ -14,9 +14,7 @@
     function setColor() {
         return d3.scaleOrdinal(d3.schemeCategory20);
     }
-    function createWordCloud(data) {
-        console.log(data);
-        console.log(data);
+    function createWordCloud(init__,data) {
         var color = setColor();
         const {
             domain,
@@ -56,6 +54,12 @@
                     return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
                 })
                 .text(d => d.text)
+                .on('mouseover',(d)=>{
+                    console.log();
+                    var barWords = findWords(init__, d.content);
+                    console.log(barWords)
+                    createBarchart(barWords,2)
+                })
         }
 
         function initGraph(graph) {
@@ -97,28 +101,43 @@
         });
     }
 
-    function createBarchart(data){
-        var $barchart = d3.select(template.barchart)
-            .append('svg')
-            .attr('class','barchart')
-            .attr("width", template.width_+template.padding)
-            .attr("height", template.height_+template.padding_v)
+    function createBarchart(data,type){
 
+        if (type === 2) {
+            var $barchart = d3.select(template.barchart)
+                .select('svg')
+            $barchart.select('.bars').data([]).exit().remove();
+            $barchart.append('g').attr('class', 'bars')
+        } else {
+            var $barchart = d3.select(template.barchart)
+                .append('svg')
+                .attr('class', 'barchart')
+                .attr("width", template.width_ + template.padding)
+                .attr("height", template.height_ + template.padding_v)
+
+            $barchart.append('g').attr('class','bars')
+
+            $barchart
+                .append('g')
+                .attr('class', 'x axis');
+            $barchart
+                .append('g')
+                .attr('class', 'y axis')
+        }
         var xScale,yScale,xAxis,yAxis;
         var color = setColor();
         var data_extent = d3.extent(data, d => d.num);
         render();
-
         function render() {
             initScale(data);
-            $barchart.append('g')
+            $barchart.select('.bars')
                 .selectAll('rect')
                 .data(data)
                 .enter()
                 .append('rect')
                 .attr('x',(d,i)=>{
                     console.log(xScale(i));
-                    return xScale(i) + template.padding+ 6;
+                    return xScale(i) + (template.width_-150) / (data.length + 1);
                 })
                 .attr('fill',(d,i)=>color(i))
                 .attr('width', (template.width_ - 150) / (data.length + 1))
@@ -140,21 +159,21 @@
                 .attr('y', d => (yScale(d.num) ));
 
                 $barchart
-                    .append('g')
-                    .attr('class', 'x axis')
+                    .select('.x')
                     .attr('transform', 'translate(' + template.padding + ',' + (template.height_) + ')')
+                    .transition()
                     .call(xAxis);
 
                 $barchart
-                    .append('g')
-                    .attr('class', 'y axis')
+                    .select('.y')
                     .attr('transform', 'translate(' + 2*template.padding + ',0)')
+                    .transition()
                     .call(yAxis);
         }
 
         function initScale(data) {
             xScale = d3.scaleLinear()
-                .domain([0,data.length])
+                .domain([0,data.length+1])
                 .range([
                     template.padding,
                     template.width
@@ -170,7 +189,7 @@
                 .axisBottom()
                 .scale(xScale)
                 .tickFormat((d,i)=>{
-                    if(i===0) {
+                    if(i===0||i===data.length+1) {
                         return null;
                     }
                     return data[i-1].name;
@@ -184,6 +203,18 @@
         }
     }
 
+    function findWords(words,content) {
+        var result = [];
+        words.map(value => {
+            content.map(key => {
+                if (value.name === key) {
+                    result.push(value)
+                }
+            })
+        })
+
+        return result;
+    }
     loadData(template.file)
         .then(parsed_data => {
             var debug = true;
@@ -194,8 +225,19 @@
                 words.push(parsed_data[index])
 
             }
-            createWordCloud(words);
-            createBarchart(words)
+
+            fakeGroup = [{
+                name:'游子',
+                content:["归","还","客"],
+                num:4000
+            }, {
+                name: 'Test',
+                content: ["君", "春", "秋"],
+                num: 3000
+            }];
+            createWordCloud(words,fakeGroup);
+            var barWords = findWords(words,fakeGroup[0].content);
+            createBarchart(barWords)
         })
         .catch(error => {
             console.log(error);
