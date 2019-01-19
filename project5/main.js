@@ -93,10 +93,12 @@
         ctx.fillStyle = '#f03355';
 
         for (let index = 0; index < contents.length; index++) {
-            console.log('draw:',ctx);
-            ctx.fillRect(gridWidth * index, 200, 50, 20)
-            ctx.strokeText(`Test:${contents[index]}`, 0, 0);
+            // console.log('draw:',ctx);
+            ctx.fillRect(gridWidth * index, 200, gridWidth-gridMargin, 8)
+            ctx.strokeText(`${contents[index]}`, index * gridWidth ,220);
         }
+        ctx.closePath();
+        // console.log('drawCatagories');
 
     }
 
@@ -215,7 +217,7 @@
     let timer;
     const layouts = [toRandom,toContinent,toGender];
     // animate the points to a given layout
-    function animate(layout,type) {
+    function animate(layout,index) {
         // timer.stop();
         // store the source position
         points.forEach(point => {
@@ -246,12 +248,12 @@
             });
 
             // update what is drawn on screen
-            draw();
+            draw(index);
 
-            if (t==1 && type==2) {
-                console.log('...');
-                timer.stop();
-            }
+            // if (t==1 && type==2) {
+            //     console.log('...');
+            //     timer.stop();
+            // }
         });
     }
 
@@ -264,7 +266,7 @@
         ctx[type]();
     }
 
-    function draw() {
+    function draw(index) {
         const ctx = canvas.node().getContext('2d');
         ctx.save();
 
@@ -280,6 +282,12 @@
         //  ctx.fillText("sss",20,20)
         //  console.log(ctx);
          ctx.restore();
+
+// @Test
+        // drawCatagories(1,template.width)
+        if (index!==undefined) {
+            drawCatagories(index, template.width)
+        }
     }
 
     // create the canvas
@@ -311,7 +319,9 @@
             }
             if (point.id%2 === 0) {
                       point.x += Math.random() * (point.id + 1) / 8;
-                      point.y += Math.random() * (point.id + 1) / Math.sqrt(point.id);
+                      point.y += Math.random() *
+
+                      (point.id + 1) / Math.sqrt(point.id);
             } else {
                  point.x -= Math.random() * (point.id + 1) / 8;
                  point.y -= Math.random() * (point.id + 1) / Math.sqrt(point.id);
@@ -366,8 +376,8 @@
 
                      } else {
 
-                         animate(layouts[index]);
-                         drawCatagories(index-1);
+                         animate(layouts[index],index-1);
+                        //  drawCatagories(index-1,template.width);
                      }
                     //  if (index == 0) {
                     //     d3.timer(step)
