@@ -62,3 +62,23 @@ div.margin {
 .section2 {
     min-height: 500px;
 }
+
+#relation text {
+    fill: #6a742c
+}
+
+#relation circle {
+    cursor: pointer;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 5px 7px;
+    background: honeydew;
+    font: 12px sans-serif;
+    font-weight: bold;
+    border-radius: 3px;
+    pointer-events: none;
+    /* keep the mouseover when over the tooltip */
+}
