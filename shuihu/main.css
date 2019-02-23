@@ -1,0 +1,64 @@
+body {
+    /* background: #141414; */
+    background: #dec9ac;
+}
+
+div.container {
+    position: relative;
+    background: url(timg.jpg);
+
+    /* height: 500px; */
+}
+a.scroll-button {
+    position: absolute;
+    bottom: 10%;
+    right: 50%;
+    left: auto;
+    color: aliceblue;
+    text-decoration: none;
+    font-style: "Gill Sans", sans-serif;
+}
+a.scroll-button span{
+    position: absolute;
+    top: -250%;
+    left: 35%;
+
+    width: 16px;
+    height: 16px;
+    border-left: 1px solid #fff;
+    border-bottom: 1px solid #fff;
+    transform: rotate(-45deg);
+    animation: sdb 1.5s infinite;
+}
+
+.force-svg {
+    max-height: 600px;
+    /* overflow-x: hidden;
+    overflow-y: auto; */
+    overflow: auto;
+}
+
+div.margin {
+    margin-top: 20px;
+}
+@keyframes sdb {
+    0% {
+        transform: rotateY(0) rotateZ(-45deg) translate(0, 0);
+        opacity: 0;
+    }
+
+    50% {
+        /* transform: rotateZ(0deg); */
+        opacity: 1;
+    }
+
+    100% {
+        transform: rotateY(720deg) rotateZ(-45deg) translate(-20px, 20px);
+        opacity: 0;
+    }
+}
+
+/* test */
+.section2 {
+    min-height: 500px;
+}
