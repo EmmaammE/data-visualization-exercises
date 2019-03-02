@@ -36,6 +36,8 @@ a.scroll-button span{
     /* overflow-x: hidden;
     overflow-y: auto; */
     overflow: auto;
+    display: flex;
+    justify-content: center;
 }
 
 div.margin {
@@ -82,3 +84,208 @@ div.tooltip {
     pointer-events: none;
     /* keep the mouseover when over the tooltip */
 }
+
+.caption {
+    position: absolute;
+    max-width: 300px;
+    top: 20px;
+    left:20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.caption .item {
+    cursor: pointer;
+}
+.caption img {
+    width: 120px;
+    /* margin-right: 20px; */
+}
+.caption .item p {
+    text-align: center;
+    margin: 0
+}
+
+#fresh-button {
+    float: right;
+    margin-right: 30px;
+}
+/*
+    ----------------------
+    utils
+    ----------------------
+*/
+ .button {
+     display: inline-block;
+     padding: 20px 50px;
+     line-height: 1;
+     color: #fff;
+     text-transform: uppercase;
+     font-weight: 600;
+     font-family: "Open Sans", arial, sans-serif;
+     font-size: 14px;
+     position: relative;
+     z-index: 10;
+ }
+
+ .button:hover {
+     cursor: pointer;
+ }
+
+
+ /*
+   * Button 1
+   */
+ .button-1 {
+     background: rgba(#54b14e, .5);
+     padding-right: 62px;
+     transition: .25s color;
+     animation: button-1-bg-off 0.25s 1 ease-in-out;
+ }
+
+  .button-1:before {
+      animation-timing-function: ease-out;
+      transition: .25s all;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -2;
+      width: calc(100% - 12px);
+      height: 100%;
+      background: #54b14e;
+      animation: button-1-before-off 0.25s 1 ease-in-out;
+  }
+
+  .button-1:after {
+      animation-timing-function: ease-out;
+      transition: .25s all;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      display: block;
+      width: calc(100% + 12px);
+      height: 100%;
+      background: rgba(#54b14e, .25);
+      animation: button-1-after-off 0.25s 1 ease-in-out;
+  }
+
+ @keyframes button-1-bg-off {
+     0% {
+         padding-right: 50px;
+     }
+
+     100% {
+         padding-right: 62px;
+     }
+ }
+
+ @keyframes button-1-bg-on {
+     0% {
+         padding-right: 62px;
+     }
+
+     100% {
+         padding-right: 50px;
+     }
+ }
+
+ @keyframes button-1-bg-loop {
+
+     0%,
+     100% {
+         padding-right: 50px;
+     }
+
+     50% {
+         padding-right: 40px;
+     }
+ }
+
+ @keyframes button-1-before-on {
+     0% {
+         width: calc(100% - 12px);
+     }
+
+     100% {
+         width: 24px;
+     }
+ }
+
+ @keyframes button-1-before-off {
+     0% {
+         width: 24px;
+     }
+
+     100% {
+         width: calc(100% - 12px);
+     }
+ }
+
+ @keyframes button-1-before-loop {
+
+     0%,
+     100% {
+         width: 24px;
+     }
+
+     50% {
+         width: 12px;
+     }
+ }
+
+ @keyframes button-1-after-on {
+     0% {
+         width: calc(100% + 12px);
+     }
+
+     100% {
+         width: calc(100% + 24px);
+     }
+ }
+
+ @keyframes button-1-after-off {
+     0% {
+         width: calc(100% + 24px);
+     }
+
+     100% {
+         width: calc(100% + 12px);
+     }
+ }
+
+ @keyframes button-1-after-loop {
+
+     0%,
+     100% {
+         width: calc(100% + 24px);
+     }
+
+     50% {
+         width: calc(100% + 34px);
+     }
+ }
+
+ .button-1:hover {
+     background: rgba(#4cc644, .5);
+     animation:
+         button-1-bg-loop 3s infinite both ease-in-out,
+         button-1-bg-on 0.25s 1 ease-in-out;
+ }
+
+   .button-1:hover:before {
+       background: #4cc644;
+       animation:
+           button-1-before-loop 5s infinite both ease-in-out,
+           button-1-before-on 0.25s 1 ease-in-out;
+   }
+
+   .button-1:hover:after {
+       background: rgba(#4cc644, .25);
+       animation:
+           button-1-after-loop 3s infinite both ease-in-out,
+           button-1-after-on 0.25s 1 ease-in-out;
+   }
