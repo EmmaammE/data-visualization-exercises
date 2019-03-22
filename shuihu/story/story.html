@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        text {
+            font-family: "ProximaNova", Helvetica, Arial, sans-serif;
+            font-size: 12px;
+        }
+
+        rect {
+            fill: none;
+            stroke: #000;
+        }
+
+        path {
+            fill: none;
+            stroke-width: 2;
+            stroke: #333;
+        }
+
+        path.light {
+            stroke: #3c6da8;
+        }
+
+        path.dark {
+            stroke: #df2929;
+        }
+
+        .intro text:first-child {
+            fill: #fff;
+            stroke: #f9f9f9;
+            stroke-width: 3;
+        }
+
+        .intro text+text {
+            fill: #333;
+        }
+
+        .intro text+text.dark {
+            fill: #df2929;
+        }
+
+        .intro text+text.light {
+            fill: #3c6da8;
+        }
+
+        text {
+            font-size: 8px;
+        }
+
+        circle.hide {
+        opacity: 0;
+        pointer-events: none;
+        }
+
+        .ticks {
+        font: 10px sans-serif;
+        }
+
+        .track,
+        .track-inset,
+        .track-overlay {
+        stroke-linecap: round;
+        }
+
+        .track {
+        stroke: #000;
+        stroke-opacity: 0.3;
+        stroke-width: 10px;
+        }
+
+        .track-inset {
+        stroke: #ddd;
+        stroke-width: 8px;
+        }
+
+        .track-overlay {
+        pointer-events: stroke;
+        stroke-width: 50px;
+        stroke: transparent;
+        cursor: crosshair;
+        }
+
+        .handle {
+        fill: #fff;
+        stroke: #000;
+        stroke-opacity: 0.5;
+        stroke-width: 1.25px;
+        }
+
+        #story {
+            width: 1400px;
+            overflow: auto;
+        }
+
+        #slider {
+            width: 100%;
+            height: 50px;
+            background: #ddd;
+            z-index: 2;
+            position: fixed;
+            top: 0%;
+            /* background:transparent; */
+            box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.15),
+            3px 3px 5px 0 rgba(0, 0, 0, 0.06);
+
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="slider"></div>
+
+    <div id="story"></div>
+    <div id="chapterLine"></div>
+
+    <svg id="timeline"></svg>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.0/es6-shim.js"></script>
+   	<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.js"></script>
+   	<script src="https://d3js.org/d3.v3.min.js"></script>
+   	<!-- <script src="https://cdn.rawgit.com/abcnews/d3-layout-narrative/1.0.0/narrative.js"></script> -->
+    <script src="./narrative.js"></script>
+    <script src="../../d3.js"></script>
+
+    <script src="./storyTest.js"></script>
+
+    <!-- <script src="./chart.js"></script> -->
+    <!-- <script src="./timeline.js"></script> -->
+    <!-- <script src="https://bl.ocks.org/mhsmith/raw/5732011/d3-zoom-pan-extent.js"></script> -->
+
+</body>
+
+</html>
