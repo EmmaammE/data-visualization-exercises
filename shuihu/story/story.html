@@ -126,11 +126,15 @@
 
             display: flex;
             justify-content: center;
+
+            display: none;
         }
 
         .container {
             display: flex;
             justify-content: center;
+
+            display: none;
         }
 
         .container ul {
@@ -169,6 +173,48 @@
         .container li:nth-child(8)::before {
             background:#000;
         }
+
+        /* style for rect */
+        .circle{
+            fill-opacity: 0.65;
+        }
+
+        .bubble{
+            opacity: 1;
+            transition: opacity 0.1s;
+            /* stroke: #fff; */
+            stroke-width: 0.1;
+            cursor: pointer;
+        }
+
+        .bubble:hover text{
+            opacity: 1;
+        }
+
+        .bubble:hover rect{
+            fill-opacity: 1;
+        }
+
+        .x text {
+            font-size: 10px;
+            width: 5px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            fill: #000;
+        }
+        .year {
+            fill: #ddd;
+        }
+
+        .scatter-container {
+            display: flex;
+        }
+
+        #legends {
+            width: 200px;
+            height: 500px;
+            background: #b2df8a;
+        }
     </style>
 </head>
 
@@ -187,9 +233,14 @@
          </ul>
          <div id="story"></div>
    </div>
-    <div id="chapterLine"></div>
 
-    <svg id="timeline"></svg>
+   <div class="scatter-container">
+        <div id="scatter"></div>
+        <div id="legends">
+            <text></text>
+        </div>
+   </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.0/es6-shim.js"></script>
    	<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.js"></script>
    	<script src="https://d3js.org/d3.v3.min.js"></script>
@@ -198,11 +249,6 @@
     <script src="../../d3.js"></script>
 
     <script src="./storyTest.js"></script>
-
-    <!-- <script src="./chart.js"></script> -->
-    <!-- <script src="./timeline.js"></script> -->
-    <!-- <script src="https://bl.ocks.org/mhsmith/raw/5732011/d3-zoom-pan-extent.js"></script> -->
-
 </body>
 
 </html>
