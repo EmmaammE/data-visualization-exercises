@@ -106,13 +106,17 @@ circle.hide {
 	stroke-width: 1.25px;
 }
 
-#story {
-	overflow: auto;
-	/* overflow: hidden; */
-	min-height: 327px;
+.story-container {
+	overflow-x: auto;
 	flex-grow: 1;
 	display: flex;
 	justify-content: center;
+}
+
+#story {
+	min-height: 327px;
+	width: 100%;
+	margin:10px 2px;
 }
 
 #slider {

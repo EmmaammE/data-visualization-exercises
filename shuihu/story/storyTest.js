@@ -189,6 +189,7 @@ d3.csv('../data/event.csv', function(err, response) {
       // Some defaults
       sceneWidth = 5;
       width = scenes.length * sceneWidth * sceneSpan;
+      width<300 && (width = 300);
       height = 600;
 
       // The container element (this is the HTML fragment);
@@ -200,7 +201,7 @@ d3.csv('../data/event.csv', function(err, response) {
         .append('svg')
         .attr('id', 'narrative-chart')
         .attr('width', width)
-        .attr('height', height)
+        .attr('height', height - 10)
         .attr('transform','translate(0,10)');
 
       // Calculate the actual width of every character label.
