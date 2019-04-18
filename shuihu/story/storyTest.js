@@ -5,7 +5,8 @@ var template = {
   xScaleTick: 50,
   yScaleTick: 20
 };
-
+const debug = true;
+// scatter
 var margin = {
   top: 30,
   right: 50,
@@ -19,11 +20,12 @@ var treeMargin = {
   bottom: 60,
   left: 0
 };
-var scatterWidth = 1000 - margin.left - margin.right;
+var scatterWidth = 1200 - margin.left - margin.right;
 var scatterHeight = 960 - margin.top - margin.bottom;
 
 d3.csv('../data/event.csv', function(err, response) {
   var svg, scenes, charactersMap, width, height, sceneWidth;
+  console.log(err);
 
   var data = {
     characters: [],
@@ -31,18 +33,20 @@ d3.csv('../data/event.csv', function(err, response) {
   };
 
   response.sort((a, b) => a['年份'] - b['年份']);
-  console.log(response);
 
   d3.csv('../data/relation.csv', function(err, res) {
-    /**
-     * 修改relation的数据为符合要求的单节点数据：
-     *      如果是"relation"是自己,则将group定为相关根节点
-     */
-    // 108将中每个人的党派关系
+    err && console.log(err);
+
+    /**108 将中每个人的党派关系 */
     let groups = {
       无党派: []
     };
 
+    /**
+     * 修改relation的数据为符合要求的单节点数据：
+     *      如果是"relation"是自己,则将group定为相关根节点
+     *
+     */
     let hierarchyData = res.slice();
     res.forEach((ele, index) => {
       let _group = ele.group;
@@ -58,7 +62,6 @@ d3.csv('../data/event.csv', function(err, response) {
         hierarchyData[index]['group'] = 'root';
       }
     });
-
     console.log(hierarchyData);
     hierarchyData.push(
       {
@@ -122,7 +125,7 @@ d3.csv('../data/event.csv', function(err, response) {
 
     /** 在event.csv中出现的所有人*/
     var peopleSet = new Set();
-
+    // /** 在event.csv中出现的所有地点 */
     /**
      *      记录每一年最早出现的事件Id
      */
@@ -136,7 +139,8 @@ d3.csv('../data/event.csv', function(err, response) {
             */
     var scatterData = [];
 
-    response.forEach(ele => {
+    response.forEach((ele,index) => {
+      ele['编号']= index+1;//编号修改成按照事件发生顺序
       let arr = ele['人物'].split('、');
       if (!eventYearMap.has(+ele['年份'])) {
         eventYearMap.set(+ele['年份'], +ele['编号']);
@@ -158,7 +162,7 @@ d3.csv('../data/event.csv', function(err, response) {
         chapter: ele['章回'],
         loc: ele['地点（可确定）'],
         event: ele['事件'],
-        index: ele['编号'],
+        index: index + 1,
       });
     });
     // peopleSet.forEach(ele => {
@@ -178,15 +182,14 @@ d3.csv('../data/event.csv', function(err, response) {
     drawScatter();
     drawTree();
 
-    function drawStoryLine(data) {
+    function drawStoryLine(data,sceneSpan = 10) {
       // Get the data in the format we need to feed to d3.layout.narrative().scenes
       scenes = wrangle(data);
       console.log(scenes);
       // Some defaults
       sceneWidth = 5;
-      width = scenes.length * sceneWidth * 20;
+      width = scenes.length * sceneWidth * sceneSpan;
       height = 600;
-      labelSize = [150, 15];
 
       // The container element (this is the HTML fragment);
       if (document.getElementById('narrative-chart')) {
@@ -197,7 +200,8 @@ d3.csv('../data/event.csv', function(err, response) {
         .append('svg')
         .attr('id', 'narrative-chart')
         .attr('width', width)
-        .attr('height', height);
+        .attr('height', height)
+        .attr('transform','translate(0,10)');
 
       // Calculate the actual width of every character label.
       scenes.forEach(function(scene) {
@@ -222,17 +226,22 @@ d3.csv('../data/event.csv', function(err, response) {
         .narrative()
         .scenes(scenes)
         .size([width, height])
-        .pathSpace(10)
-        .groupMargin(10)
-        .labelSize([250, 15])
+        .pathSpace(8)
+        .groupMargin(1)
+        .labelSize([10, 10])
         .scenePadding([5, sceneWidth / 2, 5, sceneWidth / 2])
         .labelPosition('left')
         .layout();
 
       // Get the extent so we can re-size the SVG appropriately.
       svg.attr('height', narrative.extent()[1]);
+
+       const tooltip = d3.select('#story').append("div")
+         .classed("tooltip", true)
+         .style("opacity", 0);
+
       // Draw links
-      svg
+      var links = svg
         .selectAll('.link')
         .data(narrative.links())
         .enter()
@@ -241,6 +250,22 @@ d3.csv('../data/event.csv', function(err, response) {
           return 'link ' + d.character.affiliation.toLowerCase();
         })
         .attr('d', narrative.link());
+
+        links.on('mouseover',d=>{
+          console.log(d);
+          tooltip.transition()
+            .duration(300)
+            .style("opacity", 1) // show the tooltip
+          tooltip.html(() => {
+              return d.character.id;
+            })
+            .style("left", (d3.event.pageX - d3.select('.tooltip').node().offsetWidth - 5) + "px")
+            .style("top", (d3.event.pageY - d3.select('.tooltip').node().offsetHeight) + "px");
+        }).on('mouseout',d=>{
+         tooltip.transition()
+           .duration(300)
+           .style("opacity", 0) // show the tooltip
+        });
 
       // Draw the scenes
       var $scenes = svg
@@ -255,6 +280,9 @@ d3.csv('../data/event.csv', function(err, response) {
           y = Math.round(d.y) + 0.5;
           return 'translate(' + [x, y] + ')';
         });
+
+      var index = 0;//当前显示的事件详情的编号。以免多次添加元素
+      createDetailELe(narrative.scenes()[0]);
       $scenes
         .append('rect')
         .attr('width', sceneWidth)
@@ -266,27 +294,30 @@ d3.csv('../data/event.csv', function(err, response) {
         .attr('rx', 3)
         .attr('ry', 3);
 
-      var index = 0;
+
       $scenes.on('mouseover', d => {
-        console.log(d);
+        // console.log(d);
 
         if (index!= d.index) {
+          createDetailELe(d);
+        }
+      });
+
+      function createDetailELe(d) {
+        if (d) {
           var $detail = document.getElementById('event-detail');
           document.getElementsByTagName('ul')[0].remove();
           var $ul = document.createElement('ul');
-          var _chapter = d.chapter;
-          var _detail = d.event;
           var _characters = '';
           d.characters.forEach(ele => {
             _characters += ele.id + '、';
           });
-          var _loc = d.loc;
           $ul.innerHTML = `
                     <li>
                         <p>事件详情</p>
                         <div class="item">
-                            <div><span>序号</span><h3>${d.index}</h3><span>章节</span><h3>${_chapter}</h3></div>
-                            <span class="details">${_detail}</span>
+                            <div><span>序号</span><h3>${d.index}</h3><span>章节</span><h3>${d.chapter}</h3></div>
+                            <span class="details">${d.event}</span>
                         </div>
                     </li>
                     <li>
@@ -295,11 +326,12 @@ d3.csv('../data/event.csv', function(err, response) {
                     </li>
                     <li>
                         <p>地点</p>
-                        <span>${_loc}</span>
+                        <span>${d.loc}</span>
                     </li>`;
           $detail.appendChild($ul);
         }
-      });
+
+      }
 
       // Draw appearances
       svg
@@ -400,7 +432,7 @@ d3.csv('../data/event.csv', function(err, response) {
       var treemap = d3
         .tree()
         .size([height, width])
-        .separation((a, b) => (a.parent === b.parent ? 3 : 6));
+        .separation((a, b) => (a.parent === b.parent ? 20: 22));
 
       root.x0 = height / 2;
       root.y0 = 0;
@@ -422,7 +454,7 @@ d3.csv('../data/event.csv', function(err, response) {
       // }
       var toStop = false;
       var index = 0;
-      document.getElementById('switch').addEventListener('click', function(e) {
+      document.getElementById('toggle').addEventListener('click', function(e) {
         if (toStop) {
           toStop = false;
         } else {
@@ -671,15 +703,13 @@ d3.csv('../data/event.csv', function(err, response) {
       //   )
 
       //data setting
-      // yScale.domain([...peopleSet.keys()]);
-
       xScale_.domain([...peopleSet.keys()]);
       yScale_.domain([0, 258]);
       // radius.domain(d3.)
 
       $scatter
-        .append('g')
-        .attr('transform', 'translate(0,' + scatterHeight + ')')
+        .append('g') //1 -> 让rect正对刻度
+        .attr('transform', 'translate(1,' + scatterHeight + ')')
         .attr('class', 'x axis')
         .call(xAxis);
       $scatter
@@ -722,6 +752,7 @@ d3.csv('../data/event.csv', function(err, response) {
       //     .append('g')
       //     .append('rect')
       //     .attr()
+      console.log(scatterData);
       var rect = $scatter
         // .append('g')
         .selectAll('.bubble')
@@ -731,8 +762,8 @@ d3.csv('../data/event.csv', function(err, response) {
         .attr('class', 'bubble')
         .attr('y', d => yScale_(d.eventId))
         .attr('x', d => xScale_(d.person))
-        .attr('width', scatterWidth / peopleSet.size)
-        .attr('height', 4)
+        .attr('width', scatterWidth / peopleSet.size - 1)
+        .attr('height', scatterHeight / response.length)
         .attr('transform', 'translate(2,-2)')
         .attr('data-event', d => d.eventId)
         .style('fill', d => {
@@ -749,13 +780,17 @@ d3.csv('../data/event.csv', function(err, response) {
               return 0.5;
             }
           });
-          d3.select('#legends')
-            .select('text')
-            // .data([d])
-            // .enter()
-            // .append('text')
-            .text(response[d.eventId - 1]['事件']);
+          // d3.select('#legends')
+          //   .select('text')
+          //   // .data([d])
+          //   // .enter()
+          //   // .append('text')
+          //   .text(response[d.eventId -2]['事件']);
+            // !!!eventId与yScale_的数值对应（0是无效数值），对应导response需要-2
+
+            console.log(response);
           console.log(response[d.eventId - 1]);
+          console.log(d.eventId);
           // xBlock = rect.append('rect')
           //             .attr('y',0)
           //             .attr('x',xScale_(d.person))
@@ -788,13 +823,41 @@ d3.csv('../data/event.csv', function(err, response) {
 
       // .tickPadding([12])
 
-      drawBrush();
+      debug && drawBrush();
+
+      document.querySelector('.field').addEventListener('input',function(event){
+        let value = event.target.value;
+        if (peopleSet.has(value)) {
+          rect.style('opacity', e => {
+            if (e.person == value) {
+              return 1;
+            } else {
+              return 0.5;
+            }
+          });
+        }
+        console.log(event.target.value);
+      })
+
+      document.querySelector('.field').addEventListener('blur', function (event) {
+        document.querySelector('.field').value = '';
+        rect.style('opacity', e => {
+          return 1;
+        });
+      })
+
+      document.querySelector('.icon-close').addEventListener('click',function () {
+        document.querySelector('.field').value = '';
+        rect.style('opacity', e => {
+            return 1;
+        });
+      })
 
       function drawBrush() {
         var _brush = d3
           .brush()
-          .extent([[-30, -20], [scatterWidth+20, scatterHeight+10]])
-          .on('start brush', brushmoved)
+          .extent([[0,0], [scatterWidth+20, scatterHeight+10]])
+          // .on('start brush', brushmoved)
           .on('end', brushend);
 
         var $brush = $scatter
@@ -803,40 +866,52 @@ d3.csv('../data/event.csv', function(err, response) {
           .call(_brush);
         console.log('brush');
 
-        function brushmoved() {
-          var s = d3.event.selection;
-          if (s == null) {
-            // handle.attr("display", "none");
-            // circle.classed("active", false);
-          } else {
-            // console.log(s);
-            // var sx = s.map(x.invert);
-            // circle.classed("active", function (d) { return sx[0] <= d && d <= sx[1]; });
-          }
-        }
+        // function brushmoved() {
+        //   var s = d3.event.selection;
+        //   if (s == null) {
+        //     // handle.attr("display", "none");
+        //     // circle.classed("active", false);
+        //   } else {
+        //     console.log(s,'brushmoved');
+        //     // var sx = s.map(x.invert);
+        //     // circle.classed("active", function (d) { return sx[0] <= d && d <= sx[1]; });
+        //   }
+        // }
 
         function brushend() {
           var s = d3.event.selection;
-          var brushedEvent = [];
+          var brushedEvent = new Set();
           var brushedPeople = new Set();
+          // console.log(s,xScale_('高俅'),xScale_('王进'),yScale_(1),yScale_(0));
+          // var _x0 = s[0][0] < 0 ?  0 : s[0][0],
+          //   _x1 = s[1][0],
+          //   _y0 = s[0][1],
+          //   _y1 = s[1][1];
+          //   console.log(xScale_(_x0),xScale_(_x1),yScale_(_y0),yScale_(_y1));
           rect.each((p, j) => {
-            if (isBrushed(s, xScale_(p.person), yScale_(p.eventId))) {
+            if (isBrushed(s, xScale_(p.person) + 4, yScale_(p.eventId))) {
               //获得选中的元素
               console.log(p, j); //p是元素，j是小矩形方块的序号
-              brushedEvent.push(p.eventId);
+              brushedEvent.add(p.eventId);
               // console.log(response);
               response[p.eventId - 1].personArr.forEach(ele => {
                 brushedPeople.add(ele);
               });
             }
           });
-
           console.log(brushedEvent, brushedPeople);
+          var temp = [...brushedEvent],_scenes;
+          console.log(temp);
+          if (temp.length === 1) {
+            _scenes = data.scenes.slice(temp[0]-1,temp[0]);
+          } else {
+            _scenes = data.scenes.slice(
+              temp.shift() -1,
+              temp.pop()
+            );
+          }
           // draw storyline
-          var _scenes = data.scenes.slice(
-            brushedEvent[0],
-            brushedEvent[brushedEvent.length - 1] + 1
-          );
+          // var
 
           // var _characters = data.characters.filter(e => {
           //   brushedPeople.has(e.name);
@@ -844,7 +919,7 @@ d3.csv('../data/event.csv', function(err, response) {
 
           // console.log(data.characters);
           let _data = { scenes: _scenes, characters: [] };
-
+          console.log(_data.scenes);
           brushedPeople.forEach(ele => {
             // console.log('theme',colorThemes[groupMaps.get(ele)],ele);
             _data.characters.push({
@@ -857,13 +932,16 @@ d3.csv('../data/event.csv', function(err, response) {
           });
 
           drawStoryLine(_data);
-          console.log(_data);
+          // drawStoryLine(data);
+          // console.log(data);
           d3.select('.container').classed('brushed', true);
           var _containerHeight = document.querySelector('.container')
             .offsetHeight;
-        if (_containerHeight < 327) {
-          _containerHeight = 350;
-        }
+          if (_containerHeight < 327) {
+            _containerHeight = 350;
+          } else {
+            _containerHeight += 20
+          }
           // console.log(_containerHeight);
           document.querySelector('.scatter-container').style.transform =
             'translate(0,' + _containerHeight + 'px)';
@@ -878,7 +956,8 @@ d3.csv('../data/event.csv', function(err, response) {
             x1 = brush_coords[1][0],
             y0 = brush_coords[0][1],
             y1 = brush_coords[1][1];
-          return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
+          return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
+          // This return TRUE or FALSE depending on if the points is in the selected area
         }
       }
     }

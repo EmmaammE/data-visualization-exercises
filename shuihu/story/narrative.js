@@ -430,9 +430,10 @@ d3.layout.narrative = function () {
     pathSpace = 10;
     labelSize = [100, 15];
     labelPosition = 'right';
-    scenePadding = [0, 0, 0, 0];
+    scenePadding = [10, 10, 10, 10];
     groupMargin = 0;
     orientation = 'horizontal';
+    // orientation = 'vertical';
 
     // Public functions (the API)
     // ==========================
@@ -1250,7 +1251,9 @@ d3.layout.narrative = function () {
         });
 
         // Attempt to resolve collisions.
-        intros.forEach((orientation === 'vertical') ? resolveCollisionsVertical : resolveCollisionsHorizontal);
+        // intros.forEach((orientation === 'vertical') ? resolveCollisionsVertical : resolveCollisionsHorizontal);
+
+        intros.forEach( resolveCollisionsVertical);
 
         // Resolve collisions with horizontal layout.
         function resolveCollisionsHorizontal(introduction) {

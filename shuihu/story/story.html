@@ -81,9 +81,32 @@
             <text></text>
         </div> -->
         <div id="treeNodes">
-            <div id="switch" onclick="this.classList.toggle('hover')">
+            <!-- <div id="switch" onclick="this.classList.toggle('hover')">
                 <div id="toggle">
                 </div>
+            </div> -->
+
+            <div class='nodes-tools'>
+                <div class="exp">
+                    <div class="checkbox">
+                        <form>
+                            <div>
+                                <input type="checkbox" id="toggle" name="check" value="" />
+                                <label for="toggle">
+                                    <span>
+                                        <!-- This span is needed to create the "checkbox" element --></span>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                 <fieldset class="field-container">
+                     <input type="text" placeholder="搜索..." class="field" />
+                     <div class="icons-container">
+                         <div class="icon-search"></div>
+                         <div class="icon-close"></div>
+                     </div>
+                 </fieldset>
             </div>
         </div>
 
